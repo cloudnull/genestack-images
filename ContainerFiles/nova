@@ -1,0 +1,96 @@
+# syntax = docker/dockerfile:1
+# This Dockerfile uses multi-stage build to customize DEV and PROD images:
+# https://docs.docker.com/develop/develop-images/multistage-build/
+
+ARG BUILT_TAG=v3.5.1-latest
+FROM ghcr.io/rackerlabs/genestack-images/openstack-venv:${VENV_TAG} AS dependency_build
+ARG OS_VERSION=master
+ARG OS_CONSTRAINTS=master
+ARG RXT_VERSION=master
+RUN export DEBIAN_FRONTEND=noninteractive \
+  && apt-get update && apt-get upgrade -y \
+  && apt-get install --no-install-recommends -y \
+                                             bash \
+                                             brotli \
+                                             build-essential \
+                                             curl \
+                                             dh-autoreconf \
+                                             docutils-common \
+                                             gettext \
+                                             git \
+                                             libcairo2-dev \
+                                             libffi-dev \
+                                             libgirepository1.0-dev \
+                                             libjs-sphinxdoc \
+                                             libjs-underscore \
+                                             libldap2-dev \
+                                             libpq-dev \
+                                             libsasl2-dev \
+                                             libssl-dev \
+                                             libsystemd-dev \
+                                             libxml2-dev \
+                                             libxslt1-dev \
+                                             libxslt1.1 \
+                                             pkg-config \
+                                             python3-dev \
+                                             ssl-cert \
+                                             xmlsec1
+RUN /var/lib/openstack/bin/pip install --constraint https://opendev.org/openstack/requirements/raw/branch/${OS_CONSTRAINTS}/upper-constraints.txt \
+                                       git+https://opendev.org/openstack/nova.git@${RXT_VERSION}#egg=nova \
+                                       PyMySQL \
+                                       graphviz \
+                                       netaddr \
+                                       python-memcached \
+                                       pygobject
+
+COPY scripts/nova-cve-patching.sh /opt/
+RUN bash /opt/nova-cve-patching.sh
+
+RUN find / -name '*.pyc' -delete \
+  && find / -name '*.pyo' -delete \
+  && find / -name '__pycache__' -delete \
+  && find / -name '*.whl' -delete \
+  && rm -f /var/lib/openstack/lib/python*/site-packages/slapdtest/certs/client.key \
+  && rm -f /var/lib/openstack/lib/python*/site-packages/slapdtest/certs/server.key
+
+
+FROM python:3.12-slim-bookworm
+LABEL maintainer="Rackspace"
+LABEL vendor="Rackspace OpenStack Team"
+LABEL org.opencontainers.image.name="nova"
+LABEL org.opencontainers.image.description="OpenStack Service (nova) built for the enterprise."
+COPY --from=dependency_build /var/lib/openstack /var/lib/openstack
+COPY --from=dependency_build /usr/local /usr/local
+COPY --from=dependency_build /etc/openvswitch /etc/openvswitch
+COPY --from=dependency_build /var/lib/openvswitch /var/lib/openvswitch
+RUN export DEBIAN_FRONTEND=noninteractive \
+  && apt-get update && apt-get upgrade -y \
+  && apt-get install --no-install-recommends -y ovmf \
+                                                open-iscsi \
+                                                multipath-tools \
+                                                libgirepository-1.0-1 \
+                                                libosinfo-bin \
+                                                gir1.2-libosinfo-1.0 \
+                                                nfs-common \
+                                                cryptsetup \
+                                                nvme-cli \
+  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+  && apt-get clean -y \
+  && rm -rf /var/lib/apt/lists/* \
+  && find / -name '*.pyc' -delete \
+  && find / -name '*.pyo' -delete \
+  && find / -name '__pycache__' -delete \
+  && groupadd --system --gid 42424 nova \
+  && useradd --system --gid 42424 --uid 42424 --shell /sbin/nologin --create-home --home /var/lib/nova nova \
+  && mkdir -p /var/lib/openstack/etc/nova \
+  && ln -s /var/lib/openstack/etc/nova /etc/nova \
+  && chown nova:nova -h /etc/nova \
+  && chown -R nova:nova /var/lib/openstack/etc/nova
+# Set the environment variables for the nova venv
+ENV PATH="/var/lib/openstack/bin:$PATH"
+# Set the working directory
+WORKDIR /var/lib/openstack
+# Set the user and group to match the original build
+USER 42424:42424
+# Set the entrypoint to the nova-manage command
+ENTRYPOINT ["/var/lib/openstack/bin/nova-manage"]
