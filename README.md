@@ -24,6 +24,7 @@ This repository contains GitHub Actions workflows and Containerfiles for buildin
 - **Glance** - OpenStack Image Service
 - **Heat** - OpenStack Orchestration Service
 - **Neutron** - OpenStack Orchestration Service
+- **Ceilometer** - OpenStack Telemetry Service
 
 ### Supporting Services
 
@@ -178,7 +179,40 @@ docker build \
   --build-arg OS_VERSION=master \
   --build-arg OS_CONSTRAINTS=master \
   -f ContainerFiles/neutron \
-  -t neutron:local .
+-t neutron:local .
+```
+
+### Ceilometer
+
+The Ceilometer container provides OpenStack's telemetry service:
+
+**Features:**
+
+- uWSGI application server
+- CVE patching for security compliance
+
+**Build Arguments:**
+
+- `OS_VERSION` - OpenStack version (default: master)
+- `OS_CONSTRAINTS` - OpenStack constraints version
+
+#### Running Ceilometer
+
+```bash
+docker run -d \
+  --name ceilometer \
+  -v /etc/ceilometer:/etc/ceilometer \
+  ghcr.io/rackspace/genestack-images/ceilometer:master-latest
+```
+
+#### Building Ceilometer
+
+```bash
+docker build \
+  --build-arg OS_VERSION=master \
+  --build-arg OS_CONSTRAINTS=master \
+  -f ContainerFiles/ceilometer \
+  -t ceilometer:local .
 ```
 
 ### Shibd
@@ -354,6 +388,7 @@ The build process includes automatic patching for known CVEs
 - **Glance**: Patches applied via `scripts/glance-cve-patching.sh`
 - **Heat**: Patches applied via `scripts/heat-cve-patching.sh`
 - **Neutron**: Patches applied via `scripts/neutron-cve-patching.sh`
+- **Ceilometer**: Patches applied via `scripts/ceilometer-cve-patching.sh`
 
 ### Vulnerability Scanning
 
