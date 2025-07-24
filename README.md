@@ -24,6 +24,7 @@ This repository contains GitHub Actions workflows and Containerfiles for buildin
 - **Glance** - OpenStack Image Service
 - **Heat** - OpenStack Orchestration Service
 - **Neutron** - OpenStack Orchestration Service
+- **Cinder** - OpenStack Block Storage Service
 
 ### Supporting Services
 
@@ -181,6 +182,39 @@ docker build \
   -t neutron:local .
 ```
 
+### Cinder
+
+The Cinder container provides OpenStack's block storage service:
+
+**Features:**
+
+- uWSGI application server
+- CVE patching for security compliance
+
+**Build Arguments:**
+
+- `OS_VERSION` - OpenStack version (default: master)
+- `OS_CONSTRAINTS` - OpenStack constraints version
+
+#### Running Cinder
+
+```bash
+docker run -d \
+  --name cinder \
+  -p 8776:8776 \
+  -v /etc/cinder:/etc/cinder \
+  ghcr.io/rackspace/genestack-images/cinder:master-latest
+```
+
+#### Building Cinder
+
+```bash
+docker build \
+  --build-arg OS_VERSION=master \
+  --build-arg OS_CONSTRAINTS=master \
+  -f ContainerFiles/cinder \
+  -t cinder:local .
+```
 ### Shibd
 
 Lightweight Shibboleth Service Provider container:
