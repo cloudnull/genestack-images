@@ -1,0 +1,17 @@
+# syntax = docker/dockerfile:1
+# This Dockerfile uses multi-stage build to customize DEV and PROD images:
+# https://docs.docker.com/develop/develop-images/multistage-build/
+
+ARG KUBE_OVN_VERSION=v1.14.4
+FROM kubeovn/kube-ovn:${KUBE_OVN_VERSION} AS dependency_build
+
+
+FROM debian:bookworm-slim
+RUN export DEBIAN_FRONTEND=noninteractive \
+  && apt-get update && apt-get upgrade -y \
+  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+  && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+COPY --from=dependency_build /kube-ovn /kube-ovn
+COPY --from=dependency_build /usr/share/ovn /usr/share/ovn
+COPY --from=dependency_build /etc/logrotate.d /etc/logrotate.d
+WORKDIR /kube-ovn
