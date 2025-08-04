@@ -132,6 +132,7 @@ nav:
       - Designate: containers/designate.md
       - Cinder: containers/cinder.md
       - Glance: containers/glance.md
+      - Gnocchi: containers/gnocchi.md
       - Heat: containers/heat.md
       - Horizon: containers/horizon.md
       - Ironic API: containers/ironic-api.md
