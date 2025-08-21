@@ -33,11 +33,11 @@ RUN export DEBIAN_FRONTEND=noninteractive \
                                              ssl-cert \
                                              xmlsec1
 RUN /var/lib/openstack/bin/pip install --constraint https://opendev.org/openstack/requirements/raw/branch/${OS_CONSTRAINTS}/upper-constraints.txt \
-                                       git+https://opendev.org/openstack/ovn-bgp-agent@${OS_VERSION}#egg=ovn-bgp-agent \
+                                       git+https://opendev.org/openstack/ovn-bgp-agent@${OS_VERSION}#egg=ovn_bgp_agent \
                                        git+https://github.com/rackerlabs/neutron.git@${RXT_VERSION}#egg=neutron \
-                                       git+https://opendev.org/openstack/neutron-dynamic-routing@${OS_VERSION}#egg=neutron-dynamic-routing \
-                                       git+https://opendev.org/openstack/neutron-fwaas@${OS_VERSION}#egg=neutron-fwaas \
-                                       git+https://opendev.org/openstack/neutron-vpnaas@${OS_VERSION}#egg=neutron-vpnaas \
+                                       git+https://opendev.org/openstack/neutron-dynamic-routing@${OS_VERSION}#egg=neutron_dynamic_routing \
+                                       git+https://opendev.org/openstack/neutron-fwaas@${OS_VERSION}#egg=neutron_fwaas \
+                                       git+https://opendev.org/openstack/neutron-vpnaas@${OS_VERSION}#egg=neutron_vpnaas \
                                        PyMySQL \
                                        graphviz \
                                        netaddr \
