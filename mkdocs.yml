@@ -141,6 +141,7 @@ nav:
       - Cloudkitty: containers/cloudkitty.md
       - Freezer: containers/freezer.md
       - Glance: containers/glance.md
+      - Gnocchi: containers/gnocchi.md
       - Heat: containers/heat.md
       - Horizon: containers/horizon.md
       - Ironic API: containers/ironic-api.md
