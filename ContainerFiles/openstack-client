@@ -86,6 +86,8 @@ RUN /var/lib/openstack/bin/pip install --constraint https://opendev.org/openstac
 
 COPY scripts/openstack-client-cve-patching.sh /opt/
 RUN bash /opt/openstack-client-cve-patching.sh
+COPY scripts/system-security-upgrade.sh /opt/
+RUN bash /opt/system-security-upgrade.sh
 
 RUN find / -name '*.pyc' -delete \
   && find / -name '*.pyo' -delete \

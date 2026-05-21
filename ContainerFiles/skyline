@@ -30,6 +30,8 @@ RUN /var/lib/openstack/bin/pip install -r /opt/skyline-apiserver/requirements.tx
 RUN /var/lib/openstack/bin/pip install -U /opt/skyline-apiserver -c https://opendev.org/openstack/requirements/raw/branch/${OS_CONSTRAINTS}/upper-constraints.txt
 COPY scripts/skyline-cve-patching.sh /opt/
 RUN bash /opt/skyline-cve-patching.sh
+COPY scripts/system-security-upgrade.sh /opt/
+RUN bash /opt/system-security-upgrade.sh
 RUN find / -name '*.pyc' -delete \
     && find / -name '*.pyo' -delete \
     && find / -name '__pycache__' -delete \
@@ -67,5 +69,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && ln -s /var/lib/openstack/bin/gunicorn /usr/local/bin/gunicorn
 ENV PATH="/var/lib/openstack/bin:$PATH"
 WORKDIR /var/lib/openstack
+USER 42424:42424
 EXPOSE 443
 ENTRYPOINT ["/var/lib/openstack/bin/skyline-apiserver"]

@@ -47,6 +47,8 @@ RUN /var/lib/openstack/bin/pip install -vvv --constraint https://opendev.org/ope
 
 COPY scripts/neutron-cve-patching.sh /opt/
 RUN bash /opt/neutron-cve-patching.sh
+COPY scripts/system-security-upgrade.sh /opt/
+RUN bash /opt/system-security-upgrade.sh
 
 RUN find / -name '*.pyc' -delete \
   && find / -name '*.pyo' -delete \

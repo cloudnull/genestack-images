@@ -34,5 +34,8 @@ WORKDIR /app
 ARG EXPORTER_PORT=49152
 ENV EXPORTER_PORT=${EXPORTER_PORT}
 EXPOSE ${EXPORTER_PORT}
+RUN groupadd --system --gid 42424 openstack-exporter \
+  && useradd --system --gid 42424 --uid 42424 --shell /sbin/nologin --create-home --home /var/lib/openstack-exporter openstack-exporter
+USER 42424:42424
 # Run the exporter, expecting config.yaml to be mounted
 CMD ["python", "openstack_exporter.py"]

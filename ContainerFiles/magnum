@@ -41,7 +41,13 @@ RUN /var/lib/openstack/bin/pip install --constraint https://opendev.org/openstac
 
 COPY scripts/magnum-cve-patching.sh /opt/
 RUN bash /opt/magnum-cve-patching.sh
-RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+COPY scripts/system-security-upgrade.sh /opt/
+RUN bash /opt/system-security-upgrade.sh
+ARG HELM_VERSION=v3.14.0
+RUN curl -fsSL -o /tmp/get-helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
+  && chmod +x /tmp/get-helm.sh \
+  && HELM_INSTALL_DIR=/usr/local/bin USE_SUDO=false /tmp/get-helm.sh \
+  && rm -f /tmp/get-helm.sh
 RUN find / -name '*.pyc' -delete \
   && find / -name '*.pyo' -delete \
   && find / -name '__pycache__' -delete \

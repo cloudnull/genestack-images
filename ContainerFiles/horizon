@@ -55,6 +55,8 @@ RUN /var/lib/openstack/bin/pip install --constraint /tmp/upper-constraints.txt \
                                        python-memcached
 COPY scripts/horizon-cve-patching.sh /opt/
 RUN bash /opt/horizon-cve-patching.sh
+COPY scripts/system-security-upgrade.sh /opt/
+RUN bash /opt/system-security-upgrade.sh
 RUN find / -name '*.pyc' -delete \
   && find / -name '*.pyo' -delete \
   && find / -name '__pycache__' -delete \

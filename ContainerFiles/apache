@@ -25,7 +25,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && find / -name '*.pyo' -delete \
   && find / -name '__pycache__' -delete
 WORKDIR /opt/mod_wsgi
-RUN wget --no-check-certificate https://codeload.github.com/GrahamDumpleton/mod_wsgi/tar.gz/${MOD_WSGI_VERSION} \
+RUN wget --https-only https://codeload.github.com/GrahamDumpleton/mod_wsgi/tar.gz/${MOD_WSGI_VERSION} \
   && tar xvfz ${MOD_WSGI_VERSION} \
   && cd mod_wsgi-${MOD_WSGI_VERSION} \
   && ./configure --with-python=/var/lib/openstack/bin/python3 \
@@ -37,6 +37,8 @@ RUN find / -name '*.pyc' -delete \
   && find / -name '*.whl' -delete \
   && rm -f /var/lib/openstack/lib/python*/site-packages/slapdtest/certs/client.key \
   && rm -f /var/lib/openstack/lib/python*/site-packages/slapdtest/certs/server.key
+COPY scripts/system-security-upgrade.sh /opt/
+RUN bash /opt/system-security-upgrade.sh
 
 
 FROM python:3.12-slim-bookworm

@@ -25,6 +25,8 @@ RUN /var/lib/openstack/bin/pip install --constraint https://opendev.org/openstac
 
 COPY scripts/tempest-cve-patching.sh /opt/
 RUN bash /opt/tempest-cve-patching.sh
+COPY scripts/system-security-upgrade.sh /opt/
+RUN bash /opt/system-security-upgrade.sh
 
 RUN find / -name '*.pyc' -delete \
   && find / -name '*.pyo' -delete \

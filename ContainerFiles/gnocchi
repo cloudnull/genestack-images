@@ -22,6 +22,8 @@ RUN curl -fsSL -o /tmp/upper-constraints.txt https://opendev.org/openstack/requi
 
 COPY scripts/gnocchi-cve-patching.sh /opt/
 RUN bash /opt/gnocchi-cve-patching.sh
+COPY scripts/system-security-upgrade.sh /opt/
+RUN bash /opt/system-security-upgrade.sh
 
 RUN find / -name '*.pyc' -delete \
   && find / -name '*.pyo' -delete \
@@ -110,5 +112,6 @@ ENV PATH="/var/lib/openstack/bin:$PATH"
 ENV PYTHONPATH="/usr/local/lib/python3.12/site-packages:/var/lib/openstack/lib/python3.12/site-packages:$PYTHONPATH"
 # Set the working directory
 WORKDIR /var/lib/openstack
+USER 42424:42424
 # Set the entrypoint to the gnocchi upgrade command
 ENTRYPOINT ["/var/lib/openstack/bin/gnocchi-upgrade"]
